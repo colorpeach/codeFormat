@@ -1,0 +1,43 @@
+<html ng-app="codeFormat">
+<link rel="stylesheet" href="css/bootstrap.min.css"></link>
+<link rel="stylesheet" href="css/code-format.css"></link>
+<script src="js/jquery.js"></script>
+<script src="js/angular.js"></script>
+<body ng-controller="codeList">
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">code format</a>
+		</div>
+		<form class="navbar-form navbar-left" role="search">
+			<button type="submit" class="btn btn-success" ng-click="addFormat()" ng-show="tab == 'list'">new</button>
+		</form>
+		<div>{{resources}}</div>
+	</nav>
+	<div class="container">
+		<div class="list-group" ng-show="tab == 'list'">
+			<a class="list-group-item" ng-repeat="code in formatList track by $index">
+				<button type="button" class="close" aria-hidden="true" ng-click="removeFormat($index)">&times;</button>
+				<span ng-click="checkFormat($index)" class="pointer glyphicon glyphicon-check" ng-class="{'glyphicon-unchecked':!code.checked}"></span>
+				<span title="{{code.source}}">{{code.source}}</span> <span class="glyphicon glyphicon-arrow-right"></span> <span title="{{code.formatter}}">{{code.formatter}}</span>
+				<span class="glyphicon glyphicon-pencil pointer" ng-click="editFormat($index)"></span>
+			</a>
+		</div>
+		<div class="" ng-show="tab == 'detail'">
+			<form role="form">
+				<div class="form-group">
+					<label for="source">code</label>
+					<input type="text" class="form-control" id="source" placeholder="" ng-model="detail.source">
+				</div>
+				<div class="form-group">
+					<label for="format">formatter</label>
+					<textarea class="form-control" id="format" placeholder="" ng-model="detail.formatter"></textarea>
+				</div>
+				<button type="submit" class="btn btn-primary" ng-click="confirm()">save</button>
+				<button type="submit" class="btn btn-default" ng-click="cancel()">cancel</button>
+			</form>
+		</div>
+	</div>
+<script src="js/fileUpdate.js"></script>
+<script src="js/panel.js"></script>
+</body>
+</html>

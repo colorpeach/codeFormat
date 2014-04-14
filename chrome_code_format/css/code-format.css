@@ -1,0 +1,17 @@
+.pointer{
+    cursor:pointer;
+    opacity:0.7;
+}
+
+.pointer:hover{
+    opacity:1;
+    color:#428bca;
+}
+
+.glyphicon-check{
+    color:#428bca;
+}
+
+.glyphicon-unchecked{
+    color:#333;
+}
