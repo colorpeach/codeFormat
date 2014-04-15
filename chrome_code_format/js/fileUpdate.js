@@ -1,10 +1,11 @@
 angular
-    .module("fileOpera",["fileIO"])
-    .factory("fileUpdate",["io",function(io){
+    .module("fileOpera",[])
+    .factory("fileUpdate",[function(){
         var devtools = chrome.devtools;
+        var nativeIO = document.getElementById("npApiPlugin");
         var port = chrome.extension.connect(),
             devtoolsConsole = function(content){
-                devtools.inspectedWindow.eval("console.dir("+JSON.stringify(content)+")");
+                devtools.inspectedWindow.eval("console.log("+JSON.stringify(content)+")");
             },
             //need escape char
             reg = /[\*|\.|\?|\+|\$|\^|\[|\]|\(|\)|\{|\}|\||\\|\/]/g,
@@ -14,8 +15,6 @@ angular
                 return str.replace(reg1,"$3");
             },
             lastCon;
-            
-            io();
             
         return function(context){
                 //listen resourceContentCommitted,and format code
@@ -43,37 +42,17 @@ angular
                             devtoolsConsole(list);
                             return ((list[1]+context.formatMap[trim(n)]).replace(/\n/g,"\n"+list[2])+"\n")||n;
                         });
-                        devtoolsConsole(newContent);
                         resource.setContent(newContent,false,function(info){
                             if(info.isError){
-                                var byteArray = [];
-                                for (var i = 0; i < newContent.length; ++i)
-                                {
-                                    byteArray.push(newContent.charCodeAt(i));
-                                }
-                                var blobInt8 = new Int8Array(byteArray);
-                                var blob = new Blob([blobInt8]); 
-                                
-                                var reader = new FileReader();
-                                reader.onloadend = function(e){
-                                    var data = Array.prototype.slice.call(new Uint8Array(reader.result), 0);
-                                    devtoolsConsole(nativeIO.saveBlobToFile);
-                                    nativeIO.saveBlobToFile(info.details[0], data);
-                                };
-                                reader.readAsArrayBuffer(blob);
+                                port.postMessage({
+                                    path:info.details[0],
+                                    content: newContent
+                                });
                             }
                             devtoolsConsole(info);
                         });
                     }
                 });
                 
-               /* devtools.inspectedWindow.onResourceAdded.addListener(function(){
-                    devtoolsConsole("fire resourceAdded");
-                });
-                */
-                port.postMessage({
-                    scriptToInject: 'js/content.js',
-                    tabId: devtools.inspectedWindow.tabId
-                });
         }
     }]);

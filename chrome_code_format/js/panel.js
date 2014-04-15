@@ -11,7 +11,7 @@ angular
 				}
 				return map;
 			};
-	
+			///* 
 		$scope.formatList = JSON.parse(storage.getItem("formatList"))||[];
 		$scope.formatMap = toMap($scope.formatList);
 		$scope.tab = "list";
