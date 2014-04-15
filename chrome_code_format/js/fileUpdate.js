@@ -39,11 +39,11 @@ angular
                     if(matchReg.test(content)){
                         newContent = content.replace(matchReg,function(n){
                             var list = reg1.exec(n);
-                            devtoolsConsole(list);
                             return ((list[1]+context.formatMap[trim(n)]).replace(/\n/g,"\n"+list[2])+"\n")||n;
                         });
                         resource.setContent(newContent,false,function(info){
                             if(info.isError){
+                                //invoke native io write the file
                                 port.postMessage({
                                     path:info.details[0],
                                     content: newContent
@@ -53,6 +53,5 @@ angular
                         });
                     }
                 });
-                
         }
     }]);
