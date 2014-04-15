@@ -1,20 +1,21 @@
 angular
-    .module("fileOpera",[])
-    .factory("fileUpdate",[function(){
+    .module("fileOpera",["fileIO"])
+    .factory("fileUpdate",["io",function(io){
         var devtools = chrome.devtools;
         var port = chrome.extension.connect(),
             devtoolsConsole = function(content){
-                devtools.inspectedWindow.eval("console.log('"+JSON.stringify(content)+"')");
+                devtools.inspectedWindow.eval("console.dir("+JSON.stringify(content)+")");
             },
             //need escape char
             reg = /[\*|\.|\?|\+|\$|\^|\[|\]|\(|\)|\{|\}|\||\\|\/]/g,
-            //trim and get \n,\s
-            reg1 = /^(\s*\n?)(\t*\s*)(\S+)\s*\n$/,
+            //trim and get \n,\x20,\t
+            reg1 = /^(\n?)(\t*\x20*)(\S+)\s*\n$/,
             trim = function(str){
                 return str.replace(reg1,"$3");
             },
             lastCon;
-            devtoolsConsole(1);
+            
+            io();
             
         return function(context){
                 //listen resourceContentCommitted,and format code
@@ -32,7 +33,9 @@ angular
                     for(var k in context.formatMap){
                         matchReg.push(k.replace(reg,function(n){return "\\"+n;}));
                     }
-                    matchReg = new RegExp("\\n?\\s*("+matchReg.join("|")+")\\s*\\n","g");
+                    
+                    //generate regexp
+                    matchReg = new RegExp("\\n?[\\t|\\x20]*("+matchReg.join("|")+")\\s*\\n","g");
         
                     if(matchReg.test(content)){
                         newContent = content.replace(matchReg,function(n){
@@ -40,16 +43,21 @@ angular
                             devtoolsConsole(list);
                             return ((list[1]+context.formatMap[trim(n)]).replace(/\n/g,"\n"+list[2])+"\n")||n;
                         });
-                        resource.setContent(newContent,false,function(err){
-                            if(err)
-                                devtoolsConsole(err);
-                        });
-                        devtools.inspectedWindow.getResources(function(resources){
-                            devtoolsConsole(resources);
+                        devtoolsConsole(newContent);
+                        resource.setContent(newContent,false,function(info){
+                            if(info.isError){
+                                devtoolsConsole(nativeIO.saveBlobToFile);
+                                nativeIO.saveBlobToFile(details[0], content);
+                            }
+                            devtoolsConsole(info);
                         });
                     }
                 });
                 
+               /* devtools.inspectedWindow.onResourceAdded.addListener(function(){
+                    devtoolsConsole("fire resourceAdded");
+                });
+                */
                 port.postMessage({
                     scriptToInject: 'js/content.js',
                     tabId: devtools.inspectedWindow.tabId
