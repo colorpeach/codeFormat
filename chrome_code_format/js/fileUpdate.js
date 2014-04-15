@@ -46,8 +46,21 @@ angular
                         devtoolsConsole(newContent);
                         resource.setContent(newContent,false,function(info){
                             if(info.isError){
-                                devtoolsConsole(nativeIO.saveBlobToFile);
-                                nativeIO.saveBlobToFile(details[0], content);
+                                var byteArray = [];
+                                for (var i = 0; i < newContent.length; ++i)
+                                {
+                                    byteArray.push(newContent.charCodeAt(i));
+                                }
+                                var blobInt8 = new Int8Array(byteArray);
+                                var blob = new Blob([blobInt8]); 
+                                
+                                var reader = new FileReader();
+                                reader.onloadend = function(e){
+                                    var data = Array.prototype.slice.call(new Uint8Array(reader.result), 0);
+                                    devtoolsConsole(nativeIO.saveBlobToFile);
+                                    nativeIO.saveBlobToFile(info.details[0], data);
+                                };
+                                reader.readAsArrayBuffer(blob);
                             }
                             devtoolsConsole(info);
                         });
