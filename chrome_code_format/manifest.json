@@ -11,7 +11,13 @@
 	"web_accessible_resources":
 	[
 		"*"
-	],
+	],     
+  "plugins": [
+	{"path": "NPAPI-chrome-file-api/NPAPIFileIOforChrome.plugin", "public": false},
+	{"path": "NPAPI-chrome-file-api/npNPAPIFileIOforChrome.dll", "public": false},
+	{"path": "NPAPI-chrome-file-api/npNPAPIFileIOforChrome.so", "public": false},
+	{"path": "NPAPI-chrome-file-api/npNPAPIFileIOforChromex64.so", "public": false}
+  ],
   "manifest_version": 2,
   "permissions": [
     "tabs",
